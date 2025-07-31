@@ -14,7 +14,7 @@ spring:
       hibernate:
         format_sql: true
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: redpanda:9092
     consumer:
       group-id: user-group
       auto-offset-reset: earliest

@@ -6,9 +6,9 @@ spring:
     name: notification-service
   data:
     mongodb:
-      uri: mongodb://localhost:27017/notificationsdb
+      uri: mongodb://mongo:27017/notificationsdb
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: redpanda:9092
     consumer:
       group-id: notification-group
       auto-offset-reset: earliest

@@ -5,9 +5,9 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/product_db
+      uri: mongodb://mongo:27017/product_db
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: redpanda:9092
     consumer:
       group-id: product-group
       auto-offset-reset: earliest
