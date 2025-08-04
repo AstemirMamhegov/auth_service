@@ -33,7 +33,7 @@ public class JwtProvider {
                 .setSubject(user.getId().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + props.getRefreshTokenExpiration()))
-                .signWith(SignatureAlgorithm.HS512, props.getSecret())
+                .signWith(Keys.hmacShaKeyFor(props.getSecret().getBytes()), SignatureAlgorithm.HS512)
                 .compact();
 
         return new AuthResponse(accessToken, refreshToken);
@@ -41,7 +41,10 @@ public class JwtProvider {
 
     public boolean validate(String token) {
         try {
-            Jwts.parser().setSigningKey(props.getSecret()).parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(Keys.hmacShaKeyFor(props.getSecret().getBytes()))
+                    .build()
+                    .parseClaimsJws(token);
             return true;
         } catch (JwtException e) {
             return false;
@@ -50,7 +53,7 @@ public class JwtProvider {
 
     public UUID getUserIdFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(props.getSecret())
+                .setSigningKey(Keys.hmacShaKeyFor(props.getSecret().getBytes()))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

@@ -42,9 +42,10 @@ public class JwtFilter extends OncePerRequestFilter {
                 Claims claims = jwtProvider.getClaims(token);
                 UUID userId = UUID.fromString(claims.getSubject());
 
-                List<String> roles = (List<String>) claims.get("roles");
+                List<?> roles = claims.get("roles", List.class);
 
                 var authorities = roles.stream()
+                        .map(Object::toString)
                         .map(SimpleGrantedAuthority::new)
                         .toList();
 
