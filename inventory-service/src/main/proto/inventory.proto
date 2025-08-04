@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option java_package = "com.example.inventoryservice.grpc";
+option java_multiple_files = true;
+
+service InventoryService {
+  rpc CheckAvailability (InventoryCheckRequest) returns (InventoryCheckResponse);
+}
+
+message InventoryItem {
+  string productId = 1;
+  int32 quantity = 2;
+}
+
+message InventoryCheckRequest {
+  repeated InventoryItem items = 1;
+}
+
+message InventoryCheckResponse {
+  bool available = 1;
+}
