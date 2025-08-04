@@ -2,6 +2,7 @@ plugins {
     id("org.springframework.boot") version "3.5.3"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.google.protobuf") version "0.9.4"
+    id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1"
     id("java")
 }
 
@@ -26,6 +27,8 @@ dependencies {
     implementation("io.grpc:grpc-stub:1.62.2")
     implementation("com.google.protobuf:protobuf-java:3.25.3")
     implementation("javax.annotation:javax.annotation-api:1.3.2") // ← вот это добавь
+    implementation("io.confluent:kafka-avro-serializer:7.5.3")
+    implementation("org.apache.avro:avro:1.11.3")
 
     runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")
@@ -33,6 +36,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
+avro {
+    setCreateSetters(true)
+}
 
 protobuf {
     protoc {
@@ -52,8 +58,20 @@ protobuf {
     }
 }
 
+tasks.withType<JavaCompile> {
+    dependsOn("generateAvroJava")
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir("build/generated-main-avro-java")
+        }
+    }
+}
 
 sourceSets["main"].proto.srcDir("src/main/proto")
+sourceSets["main"].java.srcDir("build/generated-main-avro-java")
 
 tasks.processResources {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE

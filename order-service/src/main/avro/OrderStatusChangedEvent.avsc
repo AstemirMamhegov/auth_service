@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "name": "OrderStatusChangedEvent",
+  "namespace": "com.example.orderservice.kafka.avro",
+  "fields": [
+    { "name": "orderId", "type": "string" },
+    { "name": "userId", "type": "string" },
+    { "name": "status", "type": "string" },
+    { "name": "createdAt", "type": { "type": "long", "logicalType": "timestamp-millis" } }
+  ]
+}

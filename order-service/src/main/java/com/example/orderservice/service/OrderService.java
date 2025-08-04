@@ -2,6 +2,9 @@ package com.example.orderservice.service;
 
 import com.example.orderservice.dto.OrderCreatedEvent;
 import com.example.orderservice.dto.OrderItemDto;
+import com.example.orderservice.grpc.StockCheckClient;
+import com.example.orderservice.grpc.StockCheckItem;
+import com.example.orderservice.grpc.StockCheckRequest;
 import com.example.orderservice.kafka.OrderEventPublisher;
 import com.example.orderservice.model.Order;
 import com.example.orderservice.model.OrderItem;
@@ -9,6 +12,8 @@ import com.example.orderservice.model.OrderStatus;
 import com.example.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.example.orderservice.kafka.avro.OrderStatusChangedEvent;
+import com.example.orderservice.dto.CreateOrderRequest;
 
 import java.time.Instant;
 import java.util.List;
@@ -20,42 +25,26 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final OrderEventPublisher publisher;
+    private final OrderEventPublisher orderEventPublisher;
 
-    public Order createOrder(String userId, List<OrderItemDto> items) {
-        Order order = Order.builder()
-                .id(UUID.randomUUID().toString())
-                .userId(userId)
-                .status(OrderStatus.NEW)
-                .createdAt(Instant.now())
-                .items(items.stream().map(i -> OrderItem.builder()
-                        .productId(i.getProductId())
-                        .quantity(i.getQuantity())
-                        .build()).toList())
-                .build();
+    public Order createOrder(CreateOrderRequest request) {
+        Order order = new Order();
+        order.setUserId(request.getUserId());
+        order.setStatus(OrderStatus.PLACED);
+        order.setCreatedAt(Instant.now());
 
         orderRepository.save(order);
 
-        StockCheckRequest grpcRequest = StockCheckRequest.newBuilder()
-                .addAllItems(items.stream().map(i ->
-                        StockCheckItem.newBuilder()
-                                .setProductId(i.getProductId())
-                                .setQuantity(i.getQuantity())
-                                .build()
-                ).toList())
+        OrderStatusChangedEvent event = OrderStatusChangedEvent.newBuilder()
+                .setOrderId(order.getId())
+                .setUserId(order.getUserId())
+                .setStatus(order.getStatus().name())
+                .setCreatedAt(order.getCreatedAt())
                 .build();
 
-        boolean available = stockCheckClient.check(grpcRequest);
+        orderEventPublisher.publishStatusChanged(event);
 
-        publisher.publishOrderCreated(new OrderCreatedEvent(order.getId(), items));
         return order;
     }
-
-    public Optional<Order> getById(String id) {
-        return orderRepository.findById(id);
-    }
-
-    public List<Order> getByUser(String userId) {
-        return orderRepository.findByUserId(userId);
-    }
 }
+
