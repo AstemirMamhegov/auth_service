@@ -17,8 +17,8 @@ public class OrderController {
     private final OrderService service;
 
     @PostMapping
-    public Order create(@RequestParam String userId, @RequestBody List<OrderItemDto> items) {
-        return service.createOrder(userId, items);
+    public Order create(@RequestBody CreateOrderRequest request) {
+        return service.createOrder(request);
     }
 
     @GetMapping("/user/{userId}")

@@ -1,14 +1,10 @@
 package com.example.orderservice.dto;
 
+import lombok.Data;
+import java.util.List;
+
+@Data
 public class CreateOrderRequest {
     private String userId;
-
-    // Добавь геттер и сеттер
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+    private List<OrderItemDto> items;
 }

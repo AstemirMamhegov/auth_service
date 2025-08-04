@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +30,15 @@ public class OrderService {
 
     public Order createOrder(CreateOrderRequest request) {
         Order order = new Order();
+        order.setId(UUID.randomUUID().toString());
         order.setUserId(request.getUserId());
         order.setStatus(OrderStatus.PLACED);
         order.setCreatedAt(Instant.now());
+
+        List<OrderItem> items = request.getItems().stream()
+                .map(this::toEntity)
+                .collect(Collectors.toList());
+        order.setItems(items);
 
         orderRepository.save(order);
 
@@ -46,5 +53,21 @@ public class OrderService {
 
         return order;
     }
+
+    private OrderItem toEntity(OrderItemDto dto) {
+        return OrderItem.builder()
+                .productId(dto.getProductId())
+                .quantity(dto.getQuantity())
+                .build();
+    }
+
+    public List<Order> getByUser(String userId) {
+        return orderRepository.findByUserId(userId);
+    }
+
+    public Optional<Order> getById(String id) {
+        return orderRepository.findById(id);
+    }
 }
+
 
