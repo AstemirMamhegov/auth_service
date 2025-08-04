@@ -4,6 +4,7 @@ import com.example.authservice.dto.AuthResponse;
 import com.example.authservice.entity.User;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
+import java.security.Key;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import java.util.UUID;
@@ -11,10 +12,17 @@ import java.util.UUID;
 @Component
 public class JwtProvider {
 
+    private final Key key;
+    private final JwtParser parser;
     private final JwtProperties props;
+
 
     public JwtProvider(JwtProperties props) {
         this.props = props;
+        this.key = Keys.hmacShaKeyFor(props.getSecret().getBytes());
+        this.parser = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build();
     }
 
     public AuthResponse generateTokens(User user) {
@@ -26,14 +34,14 @@ public class JwtProvider {
                         .toList())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + props.getAccessTokenExpiration()))
-                .signWith(Keys.hmacShaKeyFor(props.getSecret().getBytes()), SignatureAlgorithm.HS512)
+                .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
 
         String refreshToken = Jwts.builder()
                 .setSubject(user.getId().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + props.getRefreshTokenExpiration()))
-                .signWith(Keys.hmacShaKeyFor(props.getSecret().getBytes()), SignatureAlgorithm.HS512)
+                .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
 
         return new AuthResponse(accessToken, refreshToken);
@@ -41,10 +49,7 @@ public class JwtProvider {
 
     public boolean validate(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(Keys.hmacShaKeyFor(props.getSecret().getBytes()))
-                    .build()
-                    .parseClaimsJws(token);
+            parser.parseClaimsJws(token);
             return true;
         } catch (JwtException e) {
             return false;
@@ -52,11 +57,7 @@ public class JwtProvider {
     }
 
     public UUID getUserIdFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(props.getSecret().getBytes()))
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        Claims claims = parser.parseClaimsJws(token).getBody();
 
         return UUID.fromString(claims.getSubject());
     }
@@ -74,10 +75,6 @@ public class JwtProvider {
     }
 
     public Claims getClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(props.getSecret().getBytes()))
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        return parser.parseClaimsJws(token).getBody();
     }
 }
