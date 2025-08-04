@@ -22,7 +22,7 @@ public class JwtProvider {
                 .setSubject(user.getId().toString())
                 .claim("email", user.getEmail())
                 .claim("roles", user.getRoles().stream()
-                        .map(role -> role.getName().name())  // ← добавь .name()
+                        .map(role -> role.getName().name())
                         .toList())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + props.getAccessTokenExpiration()))

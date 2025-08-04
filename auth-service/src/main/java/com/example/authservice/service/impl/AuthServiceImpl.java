@@ -2,7 +2,10 @@ package com.example.authservice.service.impl;
 
 import com.example.authservice.dto.AuthRequest;
 import com.example.authservice.dto.AuthResponse;
+import com.example.authservice.entity.Role;
 import com.example.authservice.entity.User;
+import com.example.authservice.enums.RoleName;
+import com.example.authservice.repository.RoleRepository;
 import com.example.authservice.repository.UserRepository;
 import com.example.authservice.security.JwtProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,11 +20,16 @@ public class AuthServiceImpl implements com.example.authservice.service.AuthServ
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final RoleRepository roleRepository;
 
-    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtProvider jwtProvider) {
+    public AuthServiceImpl(UserRepository userRepository,
+                           PasswordEncoder passwordEncoder,
+                           JwtProvider jwtProvider,
+                           RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
+        this.roleRepository = roleRepository;
     }
 
     @Override
@@ -30,7 +38,9 @@ public class AuthServiceImpl implements com.example.authservice.service.AuthServ
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmailConfirmed(false);
-        user.setRoles(Set.of(/* default role */));
+        Role defaultRole = roleRepository.findByName(RoleName.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("Default role not found"));
+        user.setRoles(Set.of(defaultRole));
 
         userRepository.save(user);
         return jwtProvider.generateTokens(user);

@@ -18,7 +18,7 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
-  jwt:
-    access-token-expiration: 3600000      # 1 час
-    refresh-token-expiration: 86400000    # 24 часа
-    secret: your-super-secret-key
+jwt:
+  access-token-expiration: 3600000      # 1 час
+  refresh-token-expiration: 86400000    # 24 часа
+  secret: your-super-secret-key
