@@ -28,3 +28,8 @@ spring:
 logging:
   level:
     root: INFO
+grpc:
+  client:
+    inventory-service:
+      address: static://localhost:9091
+      negotiationType: plaintext

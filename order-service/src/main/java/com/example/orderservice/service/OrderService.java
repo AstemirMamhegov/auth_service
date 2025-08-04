@@ -36,6 +36,17 @@ public class OrderService {
 
         orderRepository.save(order);
 
+        StockCheckRequest grpcRequest = StockCheckRequest.newBuilder()
+                .addAllItems(items.stream().map(i ->
+                        StockCheckItem.newBuilder()
+                                .setProductId(i.getProductId())
+                                .setQuantity(i.getQuantity())
+                                .build()
+                ).toList())
+                .build();
+
+        boolean available = stockCheckClient.check(grpcRequest);
+
         publisher.publishOrderCreated(new OrderCreatedEvent(order.getId(), items));
         return order;
     }

@@ -67,7 +67,6 @@ public class JwtProvider {
             throw new RuntimeException("Invalid refresh token");
         }
         UUID userId = getUserIdFromToken(refreshToken);
-        // по-хорошему: вытаскивать пользователя из базы
         User dummy = new User();
         dummy.setId(userId);
         dummy.setEmail("placeholder@example.com");

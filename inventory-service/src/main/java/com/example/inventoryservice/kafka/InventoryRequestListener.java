@@ -26,7 +26,6 @@ public class InventoryRequestListener {
                 return inv != null && inv.getQuantity() >= item.getQuantity();
             });
 
-            // Сага: уменьшаем только если хватает
             if (allAvailable) {
                 for (InventoryItemDto item : event.getItems()) {
                     Inventory inv = repository.findById(item.getProductId()).orElseThrow();

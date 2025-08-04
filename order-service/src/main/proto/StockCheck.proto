@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option java_package = "com.example.orderservice.grpc";
+option java_multiple_files = true;
+
+service StockChecker {
+  rpc checkStock (StockCheckRequest) returns (StockCheckResponse);
+}
+
+message StockCheckItem {
+  string productId = 1;
+  int32 quantity = 2;
+}
+
+message StockCheckRequest {
+  repeated StockCheckItem items = 1;
+}
+
+message StockCheckResponse {
+  bool available = 1;
+}

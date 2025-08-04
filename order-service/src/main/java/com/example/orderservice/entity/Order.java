@@ -25,6 +25,4 @@ public class Order {
     private Long createdAt;
 
     private Long updatedAt;
-
-    // геттеры и сеттеры
 }

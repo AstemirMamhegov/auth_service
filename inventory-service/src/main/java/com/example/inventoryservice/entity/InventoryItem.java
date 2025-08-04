@@ -22,6 +22,4 @@ public class InventoryItem {
 
     private Long createdAt;
     private Long updatedAt;
-
-    // геттеры и сеттеры
 }
