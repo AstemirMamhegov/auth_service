@@ -15,6 +15,9 @@ java {
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://packages.confluent.io/maven")
+    }
 }
 
 dependencies {
@@ -29,6 +32,7 @@ dependencies {
     implementation("javax.annotation:javax.annotation-api:1.3.2") // ← вот это добавь
     implementation("io.confluent:kafka-avro-serializer:7.5.3")
     implementation("org.apache.avro:avro:1.11.3")
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
 
     runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")

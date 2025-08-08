@@ -2,12 +2,12 @@ package com.example.orderservice.kafka;
 
 import com.example.orderservice.dto.InventoryReservedEvent;
 import com.example.orderservice.model.Order;
-import com.example.orderservice.model.OrderStatus;
 import com.example.orderservice.repository.OrderRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import com.example.orderservice.model.OrderStatus;
 
 @Component
 @RequiredArgsConstructor
