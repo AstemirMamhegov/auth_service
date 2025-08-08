@@ -5,16 +5,18 @@ import com.example.inventoryservice.model.Inventory;
 import com.example.inventoryservice.repository.InventoryRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class InventoryRequestListener {
 
     private final InventoryRepository repository;
     private final InventoryEventPublisher publisher;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     @KafkaListener(topics = "order.created", groupId = "inventory-service-group")
     public void handle(String message) {
@@ -38,7 +40,7 @@ public class InventoryRequestListener {
             publisher.sendInventoryResult(result);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to process inventory request", e);
         }
     }
 }
